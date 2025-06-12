@@ -60,7 +60,7 @@ export default function Pet({ room = "default" }) {
         cleanliness: Math.max(pet.cleanliness - 1, 0),
         updated_at:  new Date(),
       }).eq("room", room);
-    }, 60000);
+    }, 6000);
     return () => clearInterval(id);
   }, [pet, room]);
     
