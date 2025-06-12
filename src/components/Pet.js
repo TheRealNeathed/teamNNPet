@@ -32,15 +32,7 @@ export default function Pet({ room = "default" }) {
     refreshPet();
     refreshCoins();
 
-    const ch = supabase
-      .channel(`cat:${room}`)
-      .on("postgres_changes",
-          { event: "UPDATE", schema: "public", table: "cat", filter: `room=eq.${room}` },
-          payload => setPet(payload.new)
-      )
-      .subscribe();
 
-    return () => supabase.removeChannel(ch);
   }, [room]);
 
   const refreshPet   = () =>
@@ -52,17 +44,22 @@ export default function Pet({ room = "default" }) {
       .then(({ data }) => setCoins(data || 0));
 
   /* decay each minute */
-  useEffect(() => {
-    const id = setInterval(() => {
-      supabase.from("cat").update({
-        hunger:      Math.max(pet.hunger      - 1, 0),
-        happiness:   Math.max(pet.happiness   - 1, 0),
-        cleanliness: Math.max(pet.cleanliness - 1, 0),
-        updated_at:  new Date(),
-      }).eq("room", room);
-    }, 6000);
-    return () => clearInterval(id);
-  }, [pet, room]);
+    useEffect(() => {
+        const id = setInterval(() => {
+          setPet(p => {
+            const next = {
+              hunger:      Math.max(p.hunger      - 1, 0),
+              happiness:   Math.max(p.happiness   - 1, 0),
+              cleanliness: Math.max(p.cleanliness - 1, 0),
+              born_at:     p.born_at,
+            };
+            // persist to DB
+            supabase.from("cat").update({ ...next, updated_at: new Date() }).eq("room", room);
+            return { ...p, ...next };
+          });
+        }, 6000);                // 60 000 ms = 1 min  (use 6000 for 6 s test)
+        return () => clearInterval(id);
+      }, [room]);
     
     const coinPoll = useRef(null);
     useEffect(() => {
