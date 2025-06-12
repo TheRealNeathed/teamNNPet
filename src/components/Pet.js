@@ -68,7 +68,7 @@ export default function Pet({ room = "default" }) {
     useEffect(() => {
       coinPoll.current = setInterval(() => {
         refreshCoins();          // same helper you already call after an action
-      }, 2000);
+      }, 1000);
       return () => clearInterval(coinPoll.current);
     }, [room]);
     /* helper: spend coins via ledger only */
