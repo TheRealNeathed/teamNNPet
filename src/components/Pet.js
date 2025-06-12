@@ -89,7 +89,7 @@ export default function Pet({ room = "default" }) {
 
   return (
     <div className="w-full max-w-md text-center space-y-6">
-      <h1 className="text-2xl font-bold">Virtual Cat — age {ageDays} d</h1>
+      <h1 className="text-2xl font-bold">Vesuvius — age {ageDays} d</h1>
 
       <Meter label="Hunger"      value={pet.hunger}      color="bg-red-400"   />
       <Meter label="Happiness"   value={pet.happiness}   color="bg-yellow-400"/>
